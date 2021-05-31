@@ -1,7 +1,12 @@
 metadata:
-  title: Testing Torah Emails
-  short title: Test
-  comment: This is a learning tool.  Feel free to write over it.
+  title: Torah Reading Emails
+  short title: Torah Emails
+  description: |
+    This interview produces an email to participants about who is reading Torah next week.
+  authors:
+    - name: Michael Hofrichter
+  revision_date: 2021-05-31
+  documentation: "https://github.com/michaelhofrichter/docassemble-TorahReadingEmail"
 ---
 objects:
   - readers: DAList.using(object_type=Individual, there_are_any=True, complete_attribute='complete', auto_gather=False)
@@ -97,6 +102,8 @@ subquestion: |
   
   ${ date_in_question.add_action() } 
 continue button field: date_in_question_reviewed
+under: | 
+  Details on the service for the date in question come from [Hebcal's Leyning Spreadsheets](https://www.hebcal.com/sedrot/) and are used in accordance with their license - [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 ---
 table: date_in_question.table
 rows: date_in_question
