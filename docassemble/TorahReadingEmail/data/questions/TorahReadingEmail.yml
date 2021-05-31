@@ -1,0 +1,196 @@
+metadata:
+  title: Testing Torah Emails
+  short title: Test
+  comment: This is a learning tool.  Feel free to write over it.
+---
+objects:
+  - readers: DAList.using(object_type=Individual, there_are_any=True, complete_attribute='complete', auto_gather=False)
+  - date_in_question: DAList.using(object_type=Thing, there_are_any=True, complete_attribute='complete', auto_gather=False)
+---
+modules:
+  - .sheets
+---
+code: | 
+  torahlist = read_sheet("Triennial-5780-5782", 0)
+---
+mandatory: True
+code: | 
+  readers_reviewed
+  date_in_question_reviewed
+  summary_email
+---
+question: | 
+  Summary
+subquestion: | 
+  Summary for an email: 
+  
+  ${ summary_email_template } 
+buttons: 
+  - Exit: exit
+  - Restart: restart
+event: summary_email
+---
+template: summary_email_template
+subject: Torah Reading - ${ date_in_question[0].date } - ${ date_in_question[0].parashah }
+content: | 
+  Torah Reading for ${ date_in_question[0].date } - ${ date_in_question[0].parashah }. The torah reading is ${ column_length } columns in length.
+  
+  % for item in date_in_question: 
+  ${ item.aliyah } (${ item.triennial_reading }) - ${ item.reader } 
+  
+  % endfor
+  Please let me know if there are any problems.
+
+  Thanks,
+
+---
+question: | 
+  How Long is the Torah Reading? 
+fields: 
+  - Columns?: column_length
+
+---
+code: | 
+  readers_from_sheets = read_sheet("Torah Readers", 0)
+---
+code: | 
+  readers[i].name.first
+  readers[i].name.last
+  readers[i].email
+  readers[i].always_email
+  readers[i].complete = True
+---
+question: |
+  Who is a Reader?
+fields:
+  - First Name: readers[i].name.first
+  - Last Name: readers[i].name.last
+  - Email: readers[i].email
+  - Email every time?: readers[i].always_email
+    datatype: yesno
+---
+question: | 
+  Other Readers?
+yesno: readers.there_is_another
+---
+code: | 
+  for item in readers_from_sheets:
+    new_reader = readers.appendObject()
+    new_reader.name.first = item['First Name']
+    new_reader.name.last = item['Last Name']
+    new_reader.email = item['Email']
+    if item['Always Email'] == "TRUE":
+      new_reader.always_email = True
+    else: 
+      new_reader.always_email = False
+
+  readers.prepopulated = True
+---
+code: | 
+  readers.prepopulated
+  readers.gathered = True
+---
+question: | 
+  Aliyahs for the Date in Question
+subquestion: | 
+  ${ date_in_question.table } 
+  
+  ${ date_in_question.add_action() } 
+continue button field: date_in_question_reviewed
+---
+table: date_in_question.table
+rows: date_in_question
+columns: 
+  - Date: |
+      row_item.date
+  - Aliyah: | 
+      row_item.aliyah
+  - Reading: | 
+      row_item.triennial_reading
+  - Reader : | 
+      row_item.reader
+  - Notes: | 
+      row_item.notes
+edit: 
+  - date
+  - aliyah
+  - triennial_reading     
+  - reader    
+  - notes
+delete buttons: True
+confirm: True
+---
+code: | 
+  date_in_question[i].date
+  date_in_question[i].aliyah
+  date_in_question[i].triennial_reading
+  date_in_question[i].reader
+  date_in_question[i].notes
+  date_in_question[i].complete = True
+---
+question: | 
+  Date in Question
+fields: 
+  - Date: date_in_question[i].date
+    datatype: date
+  - Parashah: date_in_question[i].parashah
+  - Aliyah: date_in_question[i].aliyah
+  - Reading: date_in_question[i].triennial_reading
+  - Reader: date_in_question[i].reader
+    required: False
+    code: |
+      reader_names
+  - Notes: date_in_question[i].notes
+    required: False
+---
+question: | 
+  Are there any other Aliyahs for the Date in Question? 
+yesno: date_in_questidate_in_questionon.there_is_another
+---
+code: |
+  for item in torahlist:
+    if as_datetime(item['Date']) > (today()) and as_datetime(item['Date']) < (today() + date_interval(days=7) ): 
+      new_date = date_in_question.appendObject()
+      new_date.date = as_datetime(item['Date'])
+      new_date.aliyah = item['Aliyah']
+      new_date.parashah = item['Parashah']
+      new_date.triennial_reading = item['Triennial Reading']
+      new_date.reader = "Unknown"
+      new_date.notes = ""
+  date_in_question.prepopulated = True
+---
+code: | 
+  date_in_question.prepopulated
+  date_in_question.gathered = True
+---
+code: | 
+  reader_names = []
+  for item in readers:
+    reader_names.append(item) 
+---
+table: readers.table
+rows: readers
+columns: 
+  - First Name: |
+      row_item.name.first
+  - Last Name: | 
+      row_item.name.last
+  - Email: | 
+      row_item.email
+  - Always Email: | 
+      row_item.always_email
+edit: 
+  - name.first
+  - name.last
+  - email
+  - always_email
+delete buttons: False 
+---
+question: | 
+  Readers
+subquestion: 
+  ${ readers.table }
+  
+  ${ readers.add_action() } 
+continue button field: readers_reviewed  
+---
