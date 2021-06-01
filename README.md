@@ -16,6 +16,7 @@ When completed, emails will be sent to any individuals named for a role and anyo
 * 0.0.1 - MVP
 * 0.0.2 - Added link for Hebcal Licsense and expanded Readme.md
 * 0.0.3 - Added emailing support.
+* 0.0.4 - Fixed emailrecipients in function
 
 ## Future Improvements:
 * increased recognition of the data from Hebcal including license clarification.

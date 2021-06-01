@@ -20,7 +20,7 @@ code: |
   emailsender.email = "hannah.hofrichter@gmail.com"
 ---
 code: | 
-  send_email_ok = send_email(to="michael.hofrichter@gmail.com", sender=emailsender, template=summary_email_template)
+  send_email_ok = send_email(to=emailrecipients, sender=emailsender, template=summary_email_template)
 ---
 modules:
   - .sheets
