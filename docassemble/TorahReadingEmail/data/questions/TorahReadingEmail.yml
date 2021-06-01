@@ -11,6 +11,16 @@ metadata:
 objects:
   - readers: DAList.using(object_type=Individual, there_are_any=True, complete_attribute='complete', auto_gather=False)
   - date_in_question: DAList.using(object_type=Thing, there_are_any=True, complete_attribute='complete', auto_gather=False)
+  - emailsender: Individual
+  - emailrecipients: DAList.using(object_type=Individual, there_are_any=True, complete_attibute='complete', auto_gather=False)
+---
+code: |
+  emailsender.name.first = "Hannah"
+  emailsender.name.last = "Hofrichter"
+  emailsender.email = "hannah.hofrichter@gmail.com"
+---
+code: | 
+  send_email_ok = send_email(to="michael.hofrichter@gmail.com", sender=emailsender, template=summary_email_template)
 ---
 modules:
   - .sheets
@@ -20,6 +30,7 @@ code: |
 ---
 mandatory: True
 code: | 
+  
   readers_reviewed
   date_in_question_reviewed
   summary_email
@@ -27,6 +38,12 @@ code: |
 question: | 
   Summary
 subquestion: | 
+  % if send_email_ok: 
+  Email Sent Successfully.
+  % else:
+  There was a problem sending the email.
+  % endif
+  
   Summary for an email: 
   
   ${ summary_email_template } 
@@ -47,7 +64,7 @@ content: |
   Please let me know if there are any problems.
 
   Thanks,
-
+  Hannah
 ---
 question: | 
   How Long is the Torah Reading? 
@@ -178,17 +195,14 @@ code: |
 table: readers.table
 rows: readers
 columns: 
-  - First Name: |
-      row_item.name.first
-  - Last Name: | 
-      row_item.name.last
+  - Name: |
+      row_item.name
   - Email: | 
       row_item.email
   - Always Email: | 
       row_item.always_email
 edit: 
-  - name.first
-  - name.last
+  - name
   - email
   - always_email
 delete buttons: False 
@@ -201,3 +215,32 @@ subquestion:
   ${ readers.add_action() } 
 continue button field: readers_reviewed  
 ---
+code: | 
+  for item in readers:
+    if item.always_email == True:
+      newrecip = emailrecipients.appendObject()
+      newrecip.name.first = item.name.first
+      newrecip.name.last = item.name.last
+      newrecip.email = item.email
+  emailrecipients_always_email_populated = True
+---
+code: | 
+  for item in date_in_question:
+    for record in readers:
+      if str(item.reader) == str(record.name):
+        newrecip = emailrecipients.appendObject()
+        newrecip.name.first = record.name.first
+        newrecip.name.last = record.name.last
+        newrecip.email = record.email
+  emailrecipients_this_week_populated = True
+---
+code: | 
+  emailrecipients_always_email_populated
+  emailrecipients_this_week_populated
+  emailrecipients.gathered = True
+---
+code: | 
+  emailrecipients[i].name.first
+  emailrecipients[i].name.last
+  emailrecipients[i].name.email
+  emailrecipients[i].complete = True

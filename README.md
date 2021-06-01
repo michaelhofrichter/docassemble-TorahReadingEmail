@@ -10,11 +10,13 @@ code: |
 
 Create a Google Sheet with the name `Torah Readers`. The columns should be: `First Name`, `Last Name`, `Email`, `Always Email`. Capitalization and spacing matters on these columns. `Always Email` should be configured with Data Validation for checkboxes only. Fill this in with any regular members of your Torah reading team. Add anyone else who needs to get these emails with the checkbox `Always Email` set to True. Delete any blank rows of the document. 
 
+When completed, emails will be sent to any individuals named for a role and anyone who was listed with the `Always Email` attribute set to True in the Google Sheet. 
+
 ## Changelog:
 * 0.0.1 - MVP
 * 0.0.2 - Added link for Hebcal Licsense and expanded Readme.md
+* 0.0.3 - Added emailing support.
 
 ## Future Improvements:
 * increased recognition of the data from Hebcal including license clarification.
 * ability to pick the date of the next event (currently defaults to any within 7 days). 
-* utilizing the `send_email` function within Docassemble to actually send the email. 
